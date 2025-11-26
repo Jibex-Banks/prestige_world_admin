@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+// src/pages/AddProduct.jsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Upload, Plus, Minus, X, Save, Image as ImageIcon, AlertCircle } from 'lucide-react';
-import './Product.css';
+import { productService } from '../services/productService';
 
-const AddProductComponent = ({ onBack, onSuccess }) => {
-  const [uploadUrl, setUploadUrl] = useState(''); // Set this from backend
+const AddProduct = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     price: '',
-    original_price: '',
+    // original_price: '',
     stock: '',
     image: '',
     description: '',
@@ -16,52 +21,62 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
     feature: [{ title: '', description: '' }],
     image_url: [{ url: '' }]
   });
-  
+
   const [imagePreview, setImagePreview] = useState('');
   const [additionalPreviews, setAdditionalPreviews] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Handle basic input changes
+  useEffect(async () => {
+    if (isEditMode) {
+      // Fetch product data for editing
+      const fetchedData = await productService.getProduct(id);
+      setFormData(fetchedData.data);
+    }
+  }, [id, isEditMode]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  // Handle main image upload
   const handleMainImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setErrors(prev => ({ ...prev, image: 'Image size must be less than 5MB' }));
         return;
       }
 
-      // Preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
 
-      // Upload to server
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
 
       try {
-        const response = await fetch(uploadUrl || '/api/upload', {
+        const imageurlresponse = await productService.imageUrl();
+        const imagedata = await imageurlresponse.data;
+        const upload_url = imagedata.upload_url;
+        const image_url = imagedata.public_image_url;
+
+
+        const response = await fetch(upload_url, {
           method: 'POST',
           body: formDataUpload
         });
-        const data = await response.json();
-        setFormData(prev => ({ ...prev, image: data.url || data.path }));
-        setErrors(prev => ({ ...prev, image: '' }));
+        if (response.ok) {
+          // setFormData(prev => ({ ...prev, image: image_url || data.path }));
+          setFormData(prev => ({ ...prev, image: image_url }));
+          setErrors(prev => ({ ...prev, image: '' }));
+        }
       } catch (error) {
         console.error('Upload error:', error);
         setErrors(prev => ({ ...prev, image: 'Failed to upload image' }));
@@ -69,7 +84,6 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
     }
   };
 
-  // Handle additional image uploads
   const handleAdditionalImageUpload = async (e, index) => {
     const file = e.target.files[0];
     if (file) {
@@ -90,19 +104,23 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
       formDataUpload.append('file', file);
 
       try {
-        const response = await fetch(uploadUrl || '/api/upload', {
+        const imageurlresponse = await productService.imageUrl();
+        const imagedata = await imageurlresponse.data;
+        const upload_url = imagedata.upload_url;
+        const image_url = imagedata.public_image_url;
+
+        const response = await fetch(upload_url, {
           method: 'POST',
           body: formDataUpload
         });
         const data = await response.json();
-        updateImageUrl(index, data.url || data.path);
+        updateImageUrl(index, image_url);
       } catch (error) {
         console.error('Upload error:', error);
       }
     }
   };
 
-  // Specification handlers
   const addSpecification = () => {
     setFormData(prev => ({
       ...prev,
@@ -126,7 +144,6 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
     }));
   };
 
-  // Feature handlers
   const addFeature = () => {
     setFormData(prev => ({
       ...prev,
@@ -150,7 +167,6 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
     }));
   };
 
-  // Image URL handlers
   const addImageUrl = () => {
     setFormData(prev => ({
       ...prev,
@@ -176,25 +192,23 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
     }));
   };
 
-  // Form validation
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
-    if (!formData.original_price || formData.original_price <= 0) newErrors.original_price = 'Valid original price is required';
+    // if (!formData.original_price || formData.original_price <= 0) newErrors.original_price = 'Valid original price is required';
     if (!formData.stock || formData.stock < 0) newErrors.stock = 'Valid stock quantity is required';
     if (!formData.image) newErrors.image = 'Main product image is required';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -202,27 +216,16 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/addProduct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
+      const response = isEditMode ? productService.updateProduct(id, formData) : productService.createProduct(formData);
 
       if (response.ok) {
-        const result = await response.text();
-        console.log('Success:', result);
         setShowSuccess(true);
-        
-        // Reset form after success
+
         setTimeout(() => {
-          setShowSuccess(false);
-          if (onSuccess) onSuccess();
-          if (onBack) onBack();
+          navigate('/admin/products');
         }, 2000);
       } else {
-        setErrors({ submit: 'Failed to add product. Please try again.' });
+        setErrors({ submit: 'Failed to save product. Please try again.' });
       }
     } catch (error) {
       console.error('Error:', error);
@@ -234,30 +237,31 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
 
   return (
     <div className="add-product-container">
-      {/* Header */}
       <div className="add-product-header">
-        <button className="back-button" onClick={onBack}>
+        <button className="back-button" onClick={() => navigate('/admin/products')}>
           <ArrowLeft size={20} />
           <span>Back to Products</span>
         </button>
-        <h1 className="add-product-title">Add New Product</h1>
-        <p className="add-product-subtitle">Fill in the details to create a new product listing</p>
+        <h1 className="add-product-title">
+          {isEditMode ? 'Edit Product' : 'Add New Product'}
+        </h1>
+        <p className="add-product-subtitle">
+          {isEditMode ? 'Update product details' : 'Fill in the details to create a new product listing'}
+        </p>
       </div>
 
-      {/* Success Message */}
       {showSuccess && (
         <div className="success-banner">
           <div className="success-content">
             <div className="success-icon">✓</div>
             <div>
-              <h3>Product Added Successfully!</h3>
-              <p>Your product has been added to the catalog.</p>
+              <h3>Product {isEditMode ? 'Updated' : 'Added'} Successfully!</h3>
+              <p>Your product has been {isEditMode ? 'updated in' : 'added to'} the catalog.</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Error Message */}
       {errors.submit && (
         <div className="error-banner">
           <AlertCircle size={20} />
@@ -265,16 +269,13 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
         </div>
       )}
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="add-product-form">
-        {/* Main Content Grid */}
         <div className="form-main-grid">
-          {/* Left Column - Basic Info */}
           <div className="form-column">
-            {/* Basic Information Section */}
+            {/* Basic Information */}
             <div className="form-card">
               <h2 className="card-title">Basic Information</h2>
-              
+
               <div className="form-field">
                 <label className="field-label">
                   Product Name <span className="required">*</span>
@@ -314,7 +315,7 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
               </div>
 
               <div className="form-row">
-                <div className="form-field">
+                {/* <div className="form-field">
                   <label className="field-label">
                     Original Price <span className="required">*</span>
                   </label>
@@ -331,11 +332,11 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
                     />
                   </div>
                   {errors.original_price && <span className="field-error">{errors.original_price}</span>}
-                </div>
+                </div> */}
 
                 <div className="form-field">
                   <label className="field-label">
-                    Sale Price <span className="required">*</span>
+                    Price <span className="required">*</span>
                   </label>
                   <div className="input-with-icon">
                     <span className="input-icon">$</span>
@@ -379,11 +380,10 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
                   placeholder="Describe your product in detail..."
                   rows="5"
                 />
-                <span className="field-hint">Provide a detailed description of the product features and benefits</span>
               </div>
             </div>
 
-            {/* Specifications Section */}
+            {/* Specifications */}
             <div className="form-card">
               <div className="card-header">
                 <h2 className="card-title">Specifications</h2>
@@ -392,7 +392,7 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
                   Add Spec
                 </button>
               </div>
-              
+
               <div className="dynamic-fields">
                 {formData.specification.map((spec, index) => (
                   <div key={index} className="dynamic-field-row">
@@ -424,7 +424,7 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
               </div>
             </div>
 
-            {/* Features Section */}
+            {/* Features */}
             <div className="form-card">
               <div className="card-header">
                 <h2 className="card-title">Product Features</h2>
@@ -433,7 +433,7 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
                   Add Feature
                 </button>
               </div>
-              
+
               <div className="dynamic-fields">
                 {formData.feature.map((feat, index) => (
                   <div key={index} className="feature-field">
@@ -468,14 +468,13 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
             </div>
           </div>
 
-          {/* Right Column - Images */}
+          {/* Images Column */}
           <div className="form-column">
-            {/* Main Image Section */}
             <div className="form-card sticky">
               <h2 className="card-title">
                 Product Images <span className="required">*</span>
               </h2>
-              
+
               <div className="main-image-upload">
                 {imagePreview ? (
                   <div className="image-preview-container">
@@ -556,13 +555,13 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
                           />
                         </label>
                       )}
-                      <input
+                      {/* <input
                         type="url"
                         value={img.url}
                         onChange={(e) => updateImageUrl(index, e.target.value)}
                         className="field-input tiny"
                         placeholder="Or paste URL"
-                      />
+                      /> */}
                     </div>
                   ))}
                 </div>
@@ -571,21 +570,20 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
           </div>
         </div>
 
-        {/* Form Actions */}
         <div className="form-actions">
-          <button type="button" className="cancel-btn" onClick={onBack}>
+          <button type="button" className="cancel-btn" onClick={() => navigate('/admin/products')}>
             Cancel
           </button>
           <button type="submit" className="submit-btn" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <div className="spinner"></div>
-                Adding Product...
+                {isEditMode ? 'Updating...' : 'Adding Product...'}
               </>
             ) : (
               <>
                 <Save size={20} />
-                Add Product
+                {isEditMode ? 'Update Product' : 'Add Product'}
               </>
             )}
           </button>
@@ -595,4 +593,4 @@ const AddProductComponent = ({ onBack, onSuccess }) => {
   );
 };
 
-export default AddProductComponent;
+export default AddProduct;
