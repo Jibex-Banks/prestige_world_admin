@@ -1,31 +1,29 @@
 // src/pages/Products.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Plus, Eye, Edit, Trash2 } from 'lucide-react';
 import { productService } from '../services/productService';
 
 
 const Products = () => {
+  const [storeProducts, setStoreProducts] = useState([]);
 
-  
-  const [mockProducts,setMockProducts ]= useState([
-    { id: 1, name: 'Premium Wireless Headphones', category: 'Electronics', price: 199.99, stock: 45, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop' },
-    { id: 2, name: 'Smart Watch Pro', category: 'Electronics', price: 299.99, stock: 32, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&h=100&fit=crop' },
-    { id: 3, name: 'Designer Sunglasses', category: 'Fashion', price: 149.99, stock: 67, image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=100&h=100&fit=crop' },
-    { id: 4, name: 'Running Shoes Elite', category: 'Sports', price: 129.99, stock: 28, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop' },
-    { id: 5, name: 'Laptop Backpack', category: 'Accessories', price: 79.99, stock: 54, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=100&h=100&fit=crop' }
-  ]);
-
-  const getProducts = productService.getAllProducts();
-
-  if(getProducts.data >= 1 || getProducts.data != null){
-    setMockProducts(getProducts.data);
+  // Api fetch
+  const fetchProducts = async () => {
+    const ProductsData = await productService.getAllProducts();
+    if (ProductsData != null) {
+      setStoreProducts(ProductsData);
+    }
   }
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const navigate = useNavigate();
   const { searchTerm } = useOutletContext();
 
-  const filteredProducts = mockProducts.filter(product =>
+  const filteredProducts = storeProducts.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -54,8 +52,8 @@ const Products = () => {
               <h3>{product.name}</h3>
               <p className="product-category">{product.category}</p>
               <div className="product-details">
-                <span className="product-price">${product.price}</span>
-                <span className={`stock-badge ${product.stock < 30 ? 'low' : ''}`}>
+                <span className="product-price">₦{product.price}</span>
+                <span className={`stock-badge ${product.stock < 10 ? 'low' : ''}`}>
                   Stock: {product.stock}
                 </span>
               </div>
@@ -63,15 +61,15 @@ const Products = () => {
                 <button className="btn-icon" title="View">
                   <Eye size={18} />
                 </button>
-                <button 
-                  className="btn-icon" 
+                <button
+                  className="btn-icon"
                   title="Edit"
                   onClick={() => navigate(`/admin/products/edit/${product.id}`)}
                 >
                   <Edit size={18} />
                 </button>
-                <button 
-                  className="btn-icon danger" 
+                <button
+                  className="btn-icon danger"
                   title="Delete"
                   onClick={() => handleDelete(product.id)}
                 >

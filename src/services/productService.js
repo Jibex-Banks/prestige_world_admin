@@ -4,7 +4,7 @@ import api from './api';
 export const productService = {
   // Get all products
   getAllProducts: async () => {
-    return await api.get('/products');
+    return (await api.get('/products'));
   },
 
   // Get single product
@@ -28,8 +28,8 @@ export const productService = {
   },
 
   // Get Image url
-  imageUrl: async ()=>{
-    return await api.get("/uploadUrl");
+  uploadImage: async ()=>{
+    return await api.get("/uploadImage");
   },
 
   // Upload product image

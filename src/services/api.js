@@ -19,7 +19,7 @@ class ApiService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data = await response.json();
+      const data = response.json();
       return data;
     } catch (error) {
       console.error('API Error:', error);

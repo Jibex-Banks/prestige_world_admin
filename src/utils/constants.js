@@ -1,7 +1,7 @@
 // src/utils/constants.js
 export const CATEGORIES = [
-  'Electronics',
-  'Fashion',
+  'Baby Products',
+  'Toys & Games',
   'Home & Living',
   'Sports & Outdoors',
   'Accessories',

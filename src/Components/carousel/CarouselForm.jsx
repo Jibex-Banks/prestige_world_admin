@@ -2,19 +2,19 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, X, Save, Image } from 'lucide-react';
 import { carouselService } from '../../services/carouselService';
-import { productService } from '../../services/productService';
+import api from '../../services/api';
 
 const CarouselForm = ({ mode, slide, onBack, onSave }) => {
   const [formData, setFormData] = useState({
     title: slide?.title || '',
     subtitle: slide?.subtitle || '',
-    buttonText: slide?.buttonText || '',
-    buttonLink: slide?.buttonLink || '',
-    image: slide?.image || '',
+    button_text: slide?.button_text || '',
+    button_link: slide?.button_link || '',
+    image_url: slide?.image_url || '',
     active: slide?.active ?? true
   });
   
-  const [imagePreview, setImagePreview] = useState(slide?.image || '');
+  const [imagePreview, setImagePreview] = useState(slide?.image_url || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -52,18 +52,9 @@ const CarouselForm = ({ mode, slide, onBack, onSave }) => {
       formDataUpload.append('file', file);
 
       try {
-        const imageurlresponse = await productService.imageUrl();
-        const imagedata = await imageurlresponse.data;
-        const upload_url = imagedata.upload_url;
-        const image_url = imagedata.public_image_url;
-
-
-        const response = await fetch(upload_url, {
-          method: 'POST',
-          body: formDataUpload
-        });
-        const data = await response.json();
-        setFormData(prev => ({ ...prev, image: image_url }));
+        const response = await api.uploadFile("/uploadImage",file)
+        const img_url = await response.public_image_url;
+        setFormData(prev => ({ ...prev, image_url: img_url }));
         setErrors(prev => ({ ...prev, image: '' }));
       } catch (error) {
         console.error('Upload error:', error);
@@ -79,7 +70,7 @@ const CarouselForm = ({ mode, slide, onBack, onSave }) => {
       newErrors.title = 'Title is required';
     }
     
-    if (!formData.image) {
+    if (!formData.image_url) {
       newErrors.image = 'Slide image is required';
     }
     
@@ -162,8 +153,8 @@ const CarouselForm = ({ mode, slide, onBack, onSave }) => {
                 <label className="field-label">Button Text</label>
                 <input
                   type="text"
-                  name="buttonText"
-                  value={formData.buttonText}
+                  name="button_text"
+                  value={formData.button_text}
                   onChange={handleChange}
                   className="field-input"
                   placeholder="e.g., Shop Now"
@@ -174,8 +165,8 @@ const CarouselForm = ({ mode, slide, onBack, onSave }) => {
                 <label className="field-label">Button Link</label>
                 <input
                   type="text"
-                  name="buttonLink"
-                  value={formData.buttonLink}
+                  name="button_link"
+                  value={formData.button_link}
                   onChange={handleChange}
                   className="field-input"
                   placeholder="e.g., /sale"
@@ -211,7 +202,7 @@ const CarouselForm = ({ mode, slide, onBack, onSave }) => {
                     className="remove-image"
                     onClick={() => {
                       setImagePreview('');
-                      setFormData(prev => ({ ...prev, image: '' }));
+                      setFormData(prev => ({ ...prev, image_url: '' }));
                     }}
                   >
                     <X size={18} />

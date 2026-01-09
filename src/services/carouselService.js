@@ -4,7 +4,7 @@ import api from './api';
 export const carouselService = {
   // Get all carousel slides
   getAllSlides: async () => {
-    return await api.get('/carousels');
+    return (await api.get('/carousels'));
   },
 
   // Get single slide

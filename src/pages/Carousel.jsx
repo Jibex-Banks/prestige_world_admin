@@ -6,9 +6,9 @@ import CarouselForm from '../Components/carousel/CarouselForm';
 import { carouselService } from '../services/carouselService';
 
 // const mockCarouselSlides = [
-//   { id: 1, image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1920&h=600&fit=crop', title: 'Summer Sale', subtitle: 'Up to 50% Off', buttonText: 'Shop Now', buttonLink: '/sale', order: 1, active: true },
-//   { id: 2, image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=600&fit=crop', title: 'New Arrivals', subtitle: 'Check out the latest products', buttonText: 'Explore', buttonLink: '/new', order: 2, active: true },
-//   { id: 3, image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1920&h=600&fit=crop', title: 'Premium Collection', subtitle: 'Luxury items for you', buttonText: 'View Collection', buttonLink: '/premium', order: 3, active: false }
+//   { id: 1, image_url: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1920&h=600&fit=crop', title: 'Summer Sale', subtitle: 'Up to 50% Off', buttonText: 'Shop Now', buttonLink: '/sale', order: 1, active: true },
+//   { id: 2, image_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=600&fit=crop', title: 'New Arrivals', subtitle: 'Check out the latest products', buttonText: 'Explore', buttonLink: '/new', order: 2, active: true },
+//   { id: 3, image_url: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1920&h=600&fit=crop', title: 'Premium Collection', subtitle: 'Luxury items for you', buttonText: 'View Collection', buttonLink: '/premium', order: 3, active: false }
 // ];
 
 const Carousel = () => {
@@ -17,11 +17,13 @@ const Carousel = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
 
+
   // Api fetch
   const fetchCarousels = async () =>{
     const CarouselsData = await carouselService.getAllSlides();
-    setSlides(CarouselsData.data);
-    console.log(CarouselsData.data);
+    if (CarouselsData != null){
+      setSlides(CarouselsData);
+    }
   }
 
   useEffect(()=>{
@@ -56,7 +58,7 @@ const Carousel = () => {
   };
 
   const handleToggleActive = (id) => {
-    carouselService.toggleSlideActive();
+    carouselService.toggleSlideActive(id);
     fetchCarousels();
     // setSlides(slides.map(s => s.id === id ? { ...s, active: !s.active } : s));    
   };
@@ -122,12 +124,12 @@ const Carousel = () => {
             </div>
             
             <div className="carousel-preview">
-              <img src={slide.image} alt={slide.title} />
+              <img src={slide.image_url} alt={slide.title} />
               <div className="carousel-overlay">
                 <div className="overlay-content">
                   <h3>{slide.title}</h3>
                   <p>{slide.subtitle}</p>
-                  <span className="overlay-button">{slide.buttonText}</span>
+                  <span className="overlay-button">{slide.button_text}</span>
                 </div>
               </div>
             </div>
@@ -138,17 +140,17 @@ const Carousel = () => {
                 <p className="carousel-subtitle">{slide.subtitle}</p>
                 <div className="carousel-meta">
                   <span className="order-badge">Order: {slide.order}</span>
-                  <span className={`status-badge ${slide.active ? 'active' : 'inactive'}`}>
-                    {slide.active ? 'Active' : 'Inactive'}
+                  <span className={`status-badge ${slide.show ? 'active' : 'inactive'}`}>
+                    {slide.show ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
 
               <div className="carousel-actions">
                 <button 
-                  className={`btn-icon ${slide.active ? 'active' : ''}`}
+                  className={`btn-icon ${slide.show ? 'active' : ''}`}
                   onClick={() => handleToggleActive(slide.id)}
-                  title={slide.active ? 'Deactivate' : 'Activate'}
+                  title={slide.show ? 'Deactivate' : 'Activate'}
                 >
                   <Eye size={18} />
                 </button>
