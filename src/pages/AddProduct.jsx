@@ -146,29 +146,33 @@ const AddProduct = () => {
      DYNAMIC FIELDS - IMAGE URLs
   ======================== */
   const addImageUrl = () => {
-    setFormData(prev => ({
-      ...prev,
-      image_url: [...prev.image_url, { image_url: '' }]
-    }));
-    setAdditionalPreviews(prev => [...prev, '']);
-  };
+  setFormData(prev => ({
+    ...prev,
+    image_url: [...prev.image_url, '']
+  }));
 
-  const handleAdditionalImageUpload = async (e, index) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  setAdditionalPreviews(prev => [...prev, null]);
+};
 
-    const preview = URL.createObjectURL(file);
-    setAdditionalPreviews(prev => 
-      prev.map((p, i) => i === index ? preview : p)
-    );
+const handleAdditionalImageUpload = async (e, index) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    try {
-      const url = await uploadImage(file);
-      updateImageUrl(index, url);
-    } catch {
-      console.error('Failed to upload additional image');
-    }
-  };
+  const preview = URL.createObjectURL(file);
+
+  setAdditionalPreviews(prev => {
+    const updated = [...prev];
+    updated[index] = preview;
+    return updated;
+  });
+
+  try {
+    const url = await uploadImage(file);
+    updateImageUrl(index, url);
+  } catch {
+    console.error('Failed to upload additional image');
+  }
+};
 
   const removeImageUrl = index => {
     setFormData(prev => ({

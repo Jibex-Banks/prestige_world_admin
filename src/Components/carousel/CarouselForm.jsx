@@ -52,7 +52,7 @@ const CarouselForm = ({ mode, slide, onBack, onSave }) => {
       formDataUpload.append('file', file);
 
       try {
-        const response = await api.uploadFile("/uploadImage",file)
+        const response = await api.uploadFile("/uploadImage",file);
         const img_url = await response.public_image_url;
         setFormData(prev => ({ ...prev, image_url: img_url }));
         setErrors(prev => ({ ...prev, image: '' }));
