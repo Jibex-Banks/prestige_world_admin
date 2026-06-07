@@ -9,16 +9,16 @@ export const featuredService = {
 
   // Add product to featured
   addToFeatured: async (productId) => {
-    return await api.post('/featured', { productId });
+    return await api.post('/admin/featured', { productId });
   },
 
   // Remove from featured
   removeFromFeatured: async (productId) => {
-    return await api.delete(`/featured/${productId}`);
+    return await api.delete(`/admin/featured/${productId}`);
   },
 
   // Update featured order
   updateFeaturedOrder: async (products) => {
-    return await api.post('/featured/reorder', { products });
+    return await api.post('/admin/featured/reorder', { products });
   },
 };

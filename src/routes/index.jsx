@@ -1,5 +1,5 @@
 // src/routes/index.jsx
-import { Home, Package, ShoppingCart, Image, Star, Settings } from 'lucide-react';
+import { Home, Package, ShoppingCart, Image, Star, Settings, UserPlus } from 'lucide-react';
 
 export const adminRoutes = [
   { 
@@ -37,6 +37,12 @@ export const adminRoutes = [
     path: '/admin/settings',
     icon: Settings, 
     label: 'Settings' 
+  },
+  {
+    id: 'add-admin',
+    path: '/admin/add-admin',
+    icon: UserPlus,
+    label: 'Add Admin'
   }
 ];
 

@@ -10,6 +10,8 @@ import Carousel from './pages/Carousel';
 import Featured from './pages/Featured';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import './assets/styles/index.css';
 
 
@@ -17,6 +19,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+
         {/* Admin Routes with Layout */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
@@ -28,10 +33,11 @@ function App() {
           <Route path="carousel" element={<Carousel />} />
           <Route path="featured" element={<Featured />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="add-admin" element={<Signup />} />
         </Route>
 
-        {/* Redirect root to admin */}
-        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+        {/* Redirect root to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         
         {/* 404 Page */}
         <Route path="*" element={<NotFound />} />

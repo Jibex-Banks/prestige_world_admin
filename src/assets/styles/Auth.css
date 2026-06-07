@@ -1,0 +1,126 @@
+/* src/assets/styles/Auth.css */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg-secondary);
+  padding: var(--spacing-lg);
+}
+
+.auth-card {
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 450px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.auth-title {
+  text-align: center;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.form-input {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--color-text-primary);
+  transition: all var(--transition-speed);
+  width: 100%;
+}
+
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.password-toggle-btn:hover {
+  color: var(--color-primary);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.1);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+
+.auth-button {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: all 0.3s;
+}
+
+.auth-button:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.error-text {
+  color: var(--color-error);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}

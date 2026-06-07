@@ -1,17 +1,18 @@
 // src/components/admin/Sidebar.jsx
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import adminRoutes from '../routes';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     // Implement logout logic
     console.log('Logout clicked');
-    // Example: localStorage.removeItem('token');
-    // Example: navigate('/login');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   return (

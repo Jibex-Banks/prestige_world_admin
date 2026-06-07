@@ -27,6 +27,9 @@ const AddProduct = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(isEditMode);
+
+
 
   /* =======================
      FETCH PRODUCT (EDIT)
@@ -38,11 +41,11 @@ const AddProduct = () => {
       try {
         const res = await productService.getProduct(id);
         const product = res.data;
-
+        console.log(product);
         setFormData({
           ...product,
           price: String(product.price) || 0,
-          stock: String(product.stock) ,
+          stock: String(product.stock),
           specification: product.specification || [{ spec_key: '', spec_value: '' }],
           feature: product.feature || [{ feature: '' }],
           image_url: product.image_url || [{ image_url: '' }]
@@ -54,6 +57,8 @@ const AddProduct = () => {
         );
       } catch (err) {
         console.error('Failed to fetch product:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -146,33 +151,33 @@ const AddProduct = () => {
      DYNAMIC FIELDS - IMAGE URLs
   ======================== */
   const addImageUrl = () => {
-  setFormData(prev => ({
-    ...prev,
-    image_url: [...prev.image_url, '']
-  }));
+    setFormData(prev => ({
+      ...prev,
+      image_url: [...prev.image_url, { image_url: '' }]
+    }));
 
-  setAdditionalPreviews(prev => [...prev, null]);
-};
+    setAdditionalPreviews(prev => [...prev, null]);
+  };
 
-const handleAdditionalImageUpload = async (e, index) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleAdditionalImageUpload = async (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const preview = URL.createObjectURL(file);
+    const preview = URL.createObjectURL(file);
 
-  setAdditionalPreviews(prev => {
-    const updated = [...prev];
-    updated[index] = preview;
-    return updated;
-  });
+    setAdditionalPreviews(prev => {
+      const updated = [...prev];
+      updated[index] = preview;
+      return updated;
+    });
 
-  try {
-    const url = await uploadImage(file);
-    updateImageUrl(index, url);
-  } catch {
-    console.error('Failed to upload additional image');
-  }
-};
+    try {
+      const url = await uploadImage(file);
+      updateImageUrl(index, url);
+    } catch {
+      console.error('Failed to upload additional image');
+    }
+  };
 
   const removeImageUrl = index => {
     setFormData(prev => ({
@@ -238,7 +243,7 @@ const handleAdditionalImageUpload = async (e, index) => {
       } else {
         await productService.createProduct(payload);
       }
-      
+
       setShowSuccess(true);
       setTimeout(() => {
         navigate('/admin/products');
@@ -249,6 +254,17 @@ const handleAdditionalImageUpload = async (e, index) => {
       setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="add-product-container">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+          <p>Loading product...</p>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="add-product-container">

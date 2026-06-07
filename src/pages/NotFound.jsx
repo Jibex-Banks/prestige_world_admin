@@ -1,33 +1,30 @@
-// src/pages/NotFound.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import '../assets/styles/NotFound.css';
 
 const NotFound = () => {
-  const navigate = useNavigate();
-
   return (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      minHeight: '100vh',
-      padding: '20px',
-      textAlign: 'center'
-    }}>
-      <h1 style={{ fontSize: '72px', fontWeight: '700', marginBottom: '16px' }}>404</h1>
-      <h2 style={{ fontSize: '24px', marginBottom: '12px' }}>Page Not Found</h2>
-      <p style={{ color: 'var(--color-text-secondary)', marginBottom: '32px' }}>
-        The page you're looking for doesn't exist.
-      </p>
-      <button 
-        className="btn-primary"
-        onClick={() => navigate('/admin/dashboard')}
-      >
-        <Home size={20} />
-        Go to Dashboard
-      </button>
+    <div className="not-found-page">
+      <div className="not-found-main">
+        <div className="not-found-illustration">
+          <div className="floating-element circle-1"></div>
+          <div className="floating-element circle-2"></div>
+          <div className="floating-element circle-3"></div>
+        </div>
+        <div className="not-found-content">
+          <div className="glitch-wrapper">
+            <div className="glitch" data-text="404">404</div>
+          </div>
+          <h1 className="not-found-title">Page Not Found</h1>
+          <p className="not-found-text">
+            Oops! The page you are looking for seems to have gone on vacation.
+            Don't worry, even the best explorers get lost sometimes.
+          </p>
+          <Link to="/" className="home-btn">
+            <span className="home-btn-text">Return to Homepage</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

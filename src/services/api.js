@@ -4,6 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 class ApiService {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
+    
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -11,7 +12,7 @@ class ApiService {
       },
       ...options,
     };
-
+console.log("Rooken :", config.headers);
     try {
       const response = await fetch(url, config);
       
@@ -49,13 +50,14 @@ class ApiService {
     return this.request(endpoint, { method: 'DELETE' });
   }
 
-  async uploadFile(endpoint, file) {
+  async uploadFile(endpoint, file,upload = true) {
     const formData = new FormData();
     formData.append('file', file);
+    const token = localStorage.getItem('adminToken');
 
     return this.request(endpoint, {
       method: 'POST',
-      headers: {}, // Let browser set Content-Type for multipart/form-data
+      headers: {'Authorization': `Bearer ${token}`}, // Let browser set Content-Type for multipart/form-data
       body: formData,
     });
   }

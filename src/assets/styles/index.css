@@ -5,6 +5,7 @@
 @import './AdminDashboard.css';
 @import './Product.css';
 @import './CarouselFeatured.css';
+@import './Auth.css';
 
 /* ====================== GLOBAL RESETS ====================== */
 * {

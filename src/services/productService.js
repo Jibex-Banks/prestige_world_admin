@@ -14,17 +14,17 @@ export const productService = {
 
   // Create product
   createProduct: async (productData) => {
-    return await api.post('/addProduct', productData);
+    return await api.post('/admin/addProduct', productData);
   },
 
   // Update product
   updateProduct: async (id, productData) => {
-    return await api.put(`/updateProduct/${id}`, productData);
+    return await api.put(`/admin/updateProduct/${id}`, productData);
   },
 
   // Delete product
   deleteProduct: async (id) => {
-    return await api.delete(`/deleteProduct/${id}`);
+    return await api.delete(`/admin/deleteProduct/${id}`);
   },
 
   // Get Image url
@@ -49,6 +49,6 @@ export const productService = {
 
   // Update stock
   updateStock: async (id, stock) => {
-    return await api.put(`/products/${id}/stock`, { stock });
+    return await api.put(`/admin/products/${id}/stock`, { stock });
   },
 };

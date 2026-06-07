@@ -14,26 +14,26 @@ export const carouselService = {
 
   // Create slide
   createSlide: async (slideData) => {
-    return await api.post('/carousel', slideData);
+    return await api.post('/admin/carousel', slideData);
   },
 
   // Update slide
   updateSlide: async (id, slideData) => {
-    return await api.put(`/carousel/${id}`, slideData);
+    return await api.put(`/admin/carousel/${id}`, slideData);
   },
 
   // Delete slide
   deleteSlide: async (id) => {
-    return await api.delete(`/carousel/${id}`);
+    return await api.delete(`/admin/carousel/${id}`);
   },
 
   // Update slide order
   updateSlideOrder: async (slides) => {
-    return await api.post('/carousel/reorder', { slides });
+    return await api.post('/admin/carousel/reorder', { slides });
   },
 
   // Toggle slide active status
   toggleSlideActive: async (id) => {
-    return await api.put(`/carousel/${id}/toggle`);
+    return await api.put(`/admin/carousel/${id}/toggle`);
   },
 };
