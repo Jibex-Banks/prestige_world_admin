@@ -14,7 +14,7 @@ export const carouselService = {
 
   // Create slide
   createSlide: async (slideData) => {
-    return await api.post('/admin/carousel', slideData);
+    return await api.post('/admin/carousel', slideData,false);
   },
 
   // Update slide

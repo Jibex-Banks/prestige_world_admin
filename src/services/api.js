@@ -5,6 +5,7 @@ class ApiService {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -12,7 +13,7 @@ class ApiService {
       },
       ...options,
     };
-console.log("Rooken :", config.headers);
+
     try {
       const response = await fetch(url, config);
       
@@ -29,35 +30,53 @@ console.log("Rooken :", config.headers);
   }
 
   async get(endpoint) {
-    return this.request(endpoint, { method: 'GET' });
-  }
-
-  async post(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
+    const token = localStorage.getItem('adminToken');
+    return this.request(endpoint, { method: 'GET',
+      headers: {'Authorization': `Bearer ${token}`}
     });
   }
 
+  async post(endpoint, data, isLogin = false) {
+    const token = localStorage.getItem('adminToken');
+    if (isLogin){
+      return this.request(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    }
+    else {
+      return this.request(endpoint, {
+        method: 'POST',
+        headers: {'Authorization': `Bearer ${token}`,'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+    }
+  }
+
   async put(endpoint, data) {
+    const token = localStorage.getItem('adminToken');
     return this.request(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
+      headers: {'Authorization': `Bearer ${token}`,'Content-Type': 'application/json'},
     });
   }
 
   async delete(endpoint) {
-    return this.request(endpoint, { method: 'DELETE' });
+    const token = localStorage.getItem('adminToken');
+    return this.request(endpoint, { method: 'DELETE',
+      headers: {'Authorization': `Bearer ${token}`,'Content-Type': 'application/json'},
+    });
   }
 
-  async uploadFile(endpoint, file,upload = true) {
+  async uploadFile(endpoint, file) {
     const formData = new FormData();
     formData.append('file', file);
     const token = localStorage.getItem('adminToken');
 
     return this.request(endpoint, {
       method: 'POST',
-      headers: {'Authorization': `Bearer ${token}`}, // Let browser set Content-Type for multipart/form-data
+      headers: {'Authorization': `Bearer ${token}`}, // Let browser set Content-Type for multipart/form-da,'Content-Type': 'application/json'ta
       body: formData,
     });
   }

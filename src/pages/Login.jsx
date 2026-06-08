@@ -31,19 +31,19 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // API call to login would go here
-      const response = await api.post('/login', formData);
+      const response = await api.post('/login', formData, true);
       if (response.status != 'Email and password are required' & response.status != 'Invalid email' & response.status != 'Incorrect Password' & response.status != 'Invalid Credentials' ){
         setTimeout(() => {
             localStorage.setItem('adminToken', response.status);
             navigate('/admin/dashboard');
-           
             setIsLoading(false);
           
         }, 1000);
     }
+    else{
       setError(response.status || 'Login failed. Please check your credentials.');
       setIsLoading(false);
+    }
       
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
